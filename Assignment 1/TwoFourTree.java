@@ -247,7 +247,7 @@ public class TwoFourTree {
 
         private boolean remove (int n) {
             if (isTwoNode() || !contains(n)) return false; // Cannot remove from two node or remove a value that doesn't exist
-
+            //System.out.println("REMOVING: " + n + " v1 = " + value1 + " v2 = " + value2 + " " + (value2 == n));
             if (isThreeNode()) { // Delete value x and shift proceeding values left
                 if (value1 == n) {
                     value1 = value2;
@@ -464,8 +464,41 @@ public class TwoFourTree {
             return -1;
         }
 
-        private boolean rotCW () {
+        private int rightMostValue () {
+            if (isTwoNode()) return value1;
+            else if (isThreeNode()) return value2;
+            else if (isFourNode()) return value3;
 
+            return -1;
+        }
+
+        private boolean rotCW () {
+            TwoFourTreeItem ls = leftSibling();
+
+            if (parent == null || ls == null || ls.isTwoNode() || !isTwoNode()) return false;
+
+            int pilv = parent.immediateleft(value1);
+            int lsrm = ls.rightMostValue();
+
+            parent.replace(pilv, lsrm); // Replace parent's immediate left value with left siblings right most value
+            ls.remove(lsrm); // Remove left siblings right most value
+            insert(pilv); // Insert parent's immediate left value into current node
+
+            centerChild = leftChild; // Shift children right
+            leftChild = ls.rightChild; // Steal left sibling's child
+            if (leftChild != null) leftChild.parent = this;
+            
+            if (ls.isTwoNode()) { // Shift left sibling's children right
+                ls.rightChild = ls.centerChild;
+                ls.centerChild = null;
+            } else if (ls.isThreeNode()) {
+                ls.rightChild = ls.centerRightChild;
+                ls.centerChild = ls.centerLeftChild;
+                ls.centerLeftChild = null;
+                ls.centerRightChild = null;
+            }
+
+            return true;
         }
 
         private boolean rotCCW () {
@@ -484,7 +517,7 @@ public class TwoFourTree {
             rightChild = rs.leftChild; // Steal right siblings left most child
             if(rightChild != null) rightChild.parent = this;
 
-            if (rs.isTwoNode()) { // Shift left right sibling's children
+            if (rs.isTwoNode()) { // Shift the right sibling's children left
                 rs.leftChild = rs.centerChild;
                 rs.centerChild = null;
             } else if (rs.isThreeNode()) {
@@ -497,8 +530,69 @@ public class TwoFourTree {
             return true;
         }
 
-        private boolean deleteValue () {
+        private boolean fuseRoot () {
+            if (!isRoot() || !isTwoNode() || leftChild == null || rightChild == null || !leftChild.isTwoNode() || !rightChild.isTwoNode()) return false; // This, left and right children must be two nodes and this must be the root
+            value2 = value1; // Merge children's values into this
+            value1 = leftChild.value1;
+            value3 = rightChild.value1;
+            values = 3;
+            if (leftChild.isLeaf && rightChild.isLeaf) isLeaf = true; // If both children were leaves then this is now a leaf
+            leftChild = leftChild.leftChild; // Adopt children's children
+            centerLeftChild = leftChild.rightChild;
+            centerRightChild = rightChild.leftChild;
+            rightChild = rightChild.rightChild;
+            if (leftChild != null) leftChild.parent = this; // Children's new parent is this
+            if (centerLeftChild != null) centerLeftChild.parent = this;
+            if (centerRightChild != null) centerRightChild.parent = this;
+            if (rightChild != null) rightChild.parent = this;
+            return true;
+        }
 
+        private TwoFourTreeItem immediateRightChild (int n) {
+            if (isTwoNode()) {
+                if (n == value1) return rightChild;
+            } else if (isThreeNode()) {
+                if (n == value1) return centerChild;
+                if (n == value2) return rightChild;
+            } else if (isFourNode()) {
+                if (n == value1) return centerLeftChild;
+                if (n == value2) return centerRightChild;
+                if (n == value3) return rightChild;
+            }
+
+            return null;
+        }
+
+        private TwoFourTreeItem leftmostDescendant () {
+            if (isLeaf) return this;
+            TwoFourTreeItem ls = leftSibling(), rs = rightSibling();
+            if (isTwoNode()) {
+                if (rs != null && !rs.isTwoNode()) rotCCW();
+                else if (ls != null && !ls.isTwoNode()) rotCW();
+                else if (rs != null) rightFuse();
+                else if (ls != null) leftFuse();
+            }
+            return leftChild.leftmostDescendant();
+        }
+
+        public boolean deleteValue (int n) {
+            TwoFourTreeItem ls = leftSibling(), rs = rightSibling(), next = next(n);
+            if (isRoot()) fuseRoot();
+            if (isTwoNode()) {
+                if (rs != null && !rs.isTwoNode()) rotCCW();
+                else if (ls != null && !ls.isTwoNode()) rotCW();
+                else if (rs != null) rightFuse();
+                else if (ls != null) leftFuse();
+            }
+            if (contains(n)) {
+                //System.out.println("FOUND " + n + " in node (" + value1 + ", " + value2 + ", " +  value3 + ")" + " values: " + values + " isLeaf?: " + isLeaf);
+                if (isLeaf) return remove(n);
+                TwoFourTreeItem irlmd = immediateRightChild(n).leftmostDescendant();
+                replace(n, irlmd.value1);
+                irlmd.replace(irlmd.value1, n);
+                return irlmd.remove(n);
+            }
+            return (next == null) ? false : next.deleteValue(n);
         }
     }
 
@@ -518,7 +612,8 @@ public class TwoFourTree {
     }
 
     public boolean deleteValue(int value) {
-        return false;
+        if (root == null) return false;
+        return root.deleteValue(value);
     }
 
     public void printInOrder() {
