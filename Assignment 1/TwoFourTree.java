@@ -222,8 +222,42 @@ public class TwoFourTree {
             return next(n).addValue(n);
         }
 
-        private boolean leftFuse () {
+        private TwoFourTreeItem leftSibling () {
+            if (parent == null || parent.leftChild == this) return null;
 
+            if (parent.isTwoNode()) {
+                if (parent.rightChild == this) return parent.leftChild;
+            } else if (parent.isThreeNode()) {
+                if (parent.centerChild == this) return parent.leftChild;
+                if (parent.rightChild == this) return parent.centerChild;
+            } else if (parent.isFourNode()) {
+                if (parent.centerLeftChild == this) return parent.leftChild;
+                if (parent.centerRightChild == this) return parent.centerLeftChild;
+                if (parent.rightChild == this) return parent.centerRightChild;
+            }
+
+            return null;
+        }
+
+        private TwoFourTreeItem rightSibling () {
+            if (parent == null || parent.rightChild == this) return null;
+
+            if (parent.isTwoNode()) {
+                if (parent.leftChild == this) return parent.rightChild;
+            } else if (parent.isThreeNode()) {
+                if (parent.centerChild == this) return parent.rightChild;
+                if (parent.leftChild == this) return parent.centerChild;
+            } else if (parent.isFourNode()) {
+                if (parent.centerLeftChild == this) return parent.centerRightChild;
+                if (parent.centerRightChild == this) return parent.rightChild;
+                if (parent.leftChild == this) return parent.centerLeftChild;
+            }
+
+            return null;
+        }
+
+        private boolean leftFuse () {
+            if (parent == null || parent.isTwoNode() || !isTwoNode())
         }
 
         private boolean rightFuse () {
