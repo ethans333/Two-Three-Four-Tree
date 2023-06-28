@@ -257,7 +257,101 @@ public class TwoFourTree {
         }
 
         private boolean leftFuse () {
-            if (parent == null || parent.isTwoNode() || !isTwoNode())
+            TwoFourTreeItem ls = leftSibling();
+            if (parent == null || parent.isTwoNode() || !isTwoNode() || ls == null || !ls.isTwoNode()) return false;
+
+            if (parent.isThreeNode()) {
+                if (parent.centerChild == this) {
+                    value3 = value1;
+                    value2 = parent.value1;
+                    value1 = ls.value1;
+                    values = 3;
+                    centerRightChild = leftChild;
+                    centerLeftChild = ls.rightChild;
+                    leftChild = ls.leftChild;
+                    if (centerLeftChild != null) centerLeftChild.parent = this;
+                    if (leftChild != null) leftChild.parent = this;
+                    parent.value1 = parent.value2;
+                    parent.value2 = 0;
+                    parent.values = 1;
+                    parent.centerChild = null;
+                    parent.leftChild = this;
+                    return true;
+                } else if (parent.rightChild == this) {
+                    value3 = value1;
+                    value2 = parent.value2;
+                    value1 = ls.value1;
+                    values = 3;
+                    centerRightChild = leftChild;
+                    centerLeftChild = ls.rightChild;
+                    leftChild = ls.leftChild;
+                    if (centerLeftChild != null) centerLeftChild.parent = this;
+                    if (leftChild != null) leftChild.parent = this;
+                    parent.value2 = 0;
+                    parent.values = 1;
+                    parent.centerChild = null;
+                    parent.rightChild = this;
+                    return true;
+                }
+            } else if (parent.isFourNode()) {
+                if (parent.centerLeftChild == this) {
+                    value3 = value1;
+                    value2 = parent.value1;
+                    value1 = ls.value1;
+                    values = 3;
+                    centerRightChild = leftChild;
+                    centerLeftChild = ls.rightChild;
+                    leftChild = ls.leftChild;
+                    if (centerLeftChild != null) centerLeftChild.parent = this;
+                    if (leftChild != null) leftChild.parent = this;
+                    parent.value1 = parent.value2;
+                    parent.value2 = parent.value3;
+                    parent.value3 = 0;
+                    parent.values = 2;
+                    parent.leftChild = this;
+                    parent.centerLeftChild = null;
+                    parent.centerChild = parent.centerRightChild;
+                    parent.centerRightChild = null;
+                    return true;
+                } else if (parent.centerRightChild == this) {
+                    value3 = value1;
+                    value2 = parent.value2;
+                    value1 = ls.value1;
+                    values = 3;
+                    centerRightChild = leftChild;
+                    centerLeftChild = ls.rightChild;
+                    leftChild = ls.leftChild;
+                    if (centerLeftChild != null) centerLeftChild.parent = this;
+                    if (leftChild != null) leftChild.parent = this;
+                    parent.value2 = parent.value3;
+                    parent.value3 = 0;
+                    parent.values = 2;
+                    parent.centerLeftChild = null;
+                    parent.centerRightChild = null;
+                    parent.centerChild = this;
+                    parent.centerLeftChild = null;
+                    parent.centerRightChild = null;
+                    return true;
+                } else if (parent.rightChild == this) {
+                    value3 = value1;
+                    value2 = parent.value3;
+                    value1 = ls.value1;
+                    values = 3;
+                    centerRightChild = leftChild;
+                    centerLeftChild = ls.rightChild;
+                    leftChild = ls.leftChild;
+                    if (centerLeftChild != null) centerLeftChild.parent = this;
+                    if (leftChild != null) leftChild.parent = this;
+                    parent.value3 = 0;
+                    parent.values = 2;
+                    parent.centerChild = parent.centerLeftChild;
+                    parent.centerLeftChild = null;
+                    parent.centerRightChild = null;
+                    return true;                    
+                }
+            }
+
+            return false;
         }
 
         private boolean rightFuse () {
