@@ -326,8 +326,6 @@ public class TwoFourTree {
                     parent.value2 = parent.value3;
                     parent.value3 = 0;
                     parent.values = 2;
-                    parent.centerLeftChild = null;
-                    parent.centerRightChild = null;
                     parent.centerChild = this;
                     parent.centerLeftChild = null;
                     parent.centerRightChild = null;
@@ -394,20 +392,60 @@ public class TwoFourTree {
                     value2 = parent.value1;
                     value3 = rs.value1;
                     values = 3;
+                    centerLeftChild = rightChild;
+                    centerRightChild = rs.leftChild;
+                    rightChild = rs.rightChild;
+                    if (centerRightChild != null) centerRightChild.parent = this;
+                    if (rightChild != null) rightChild.parent = this;
+                    parent.value1 = parent.value2;
+                    parent.value2 = parent.value3;
+                    parent.value3 = 0;
+                    parent.values = 2;
+                    parent.leftChild = this;
+                    parent.centerChild = parent.centerRightChild;
+                    parent.centerLeftChild = null;
+                    parent.centerRightChild = null;
+                    return true;
                 } else if (parent.centerLeftChild == this) {
                     value2 = parent.value2;
                     value3 = rs.value1;
                     values = 3;
+                    centerLeftChild = rightChild;
+                    centerRightChild = rs.leftChild;
+                    rightChild = rs.rightChild;
+                    if (centerRightChild != null) centerRightChild.parent = this;
+                    if (rightChild != null) rightChild.parent = this;
+                    parent.value2 = parent.value3;
+                    parent.value3 = 0;
+                    parent.values = 2;
+                    parent.centerChild = this;
+                    parent.centerLeftChild = null;
+                    parent.centerRightChild = null;
+                    return true;
                 } else if (parent.centerRightChild == this) {
                     value2 = parent.value3;
                     value3 = rs.value1;
                     values = 3;
+                    centerLeftChild = rightChild;
+                    centerRightChild = rs.leftChild;
+                    rightChild = rs.rightChild;
+                    if (centerRightChild != null) centerRightChild.parent = this;
+                    if (rightChild != null) rightChild.parent = this;
+                    parent.value3 = 0;
+                    parent.values = 2;
+                    parent.rightChild = this;
+                    parent.centerChild = parent.centerLeftChild;
+                    parent.centerLeftChild = null;
+                    parent.centerRightChild = null;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private boolean rotCW () {
-
+            
         }
 
         private boolean rotCCW () {
