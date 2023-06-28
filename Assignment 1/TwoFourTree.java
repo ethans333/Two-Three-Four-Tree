@@ -355,7 +355,55 @@ public class TwoFourTree {
         }
 
         private boolean rightFuse () {
+            TwoFourTreeItem rs = rightSibling();
+            if (parent == null || parent.isTwoNode() || !isTwoNode() || rs == null || !rs.isTwoNode()) return false;
 
+            if (parent.isThreeNode()) {
+                if (parent.leftChild == this) {
+                    value2 = parent.value1;
+                    value3 = rs.value1;
+                    values = 3;
+                    centerLeftChild = rightChild;
+                    centerRightChild = rs.leftChild;
+                    rightChild = rs.rightChild;
+                    if (centerRightChild != null) centerRightChild.parent = this;
+                    if (rightChild != null) rightChild.parent = this;
+                    parent.value1 = parent.value2;
+                    parent.value2 = 0;
+                    parent.values = 1;
+                    parent.leftChild = this;
+                    parent.centerChild = null;
+                    return true;
+                } else if (parent.centerChild == this) {
+                    value2 = parent.value2;
+                    value3 = rs.value1;
+                    values = 3;
+                    centerLeftChild = rightChild;
+                    centerRightChild = rs.leftChild;
+                    rightChild = rs.rightChild;
+                    if (centerRightChild != null) centerRightChild.parent = this;
+                    if (rightChild != null) rightChild.parent = this;
+                    parent.value2 = 0;
+                    parent.values = 1;
+                    parent.rightChild = this;
+                    parent.centerChild = null;
+                    return true;
+                }
+            } else if (parent.isFourNode()) {
+                if (parent.leftChild == this) {
+                    value2 = parent.value1;
+                    value3 = rs.value1;
+                    values = 3;
+                } else if (parent.centerLeftChild == this) {
+                    value2 = parent.value2;
+                    value3 = rs.value1;
+                    values = 3;
+                } else if (parent.centerRightChild == this) {
+                    value2 = parent.value3;
+                    value3 = rs.value1;
+                    values = 3;
+                }
+            }
         }
 
         private boolean rotCW () {
