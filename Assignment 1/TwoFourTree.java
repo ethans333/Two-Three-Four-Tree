@@ -585,7 +585,8 @@ public class TwoFourTree {
                 else if (ls != null) leftFuse();
             }
             if (contains(n)) {
-                //System.out.println("FOUND " + n + " in node (" + value1 + ", " + value2 + ", " +  value3 + ")" + " values: " + values + " isLeaf?: " + isLeaf);
+                System.out.println("FOUND " + n + " in node (" + value1 + ", " + value2 + ", " +  value3 + ")" + " values: " + values + " isLeaf?: " + isLeaf);
+                System.out.println("L: " + leftChild + " CL: " + centerLeftChild + " CR: " + centerRightChild + " R: " + rightChild);
                 if (isLeaf) return remove(n);
                 TwoFourTreeItem irlmd = immediateRightChild(n).leftmostDescendant();
                 replace(n, irlmd.value1);
