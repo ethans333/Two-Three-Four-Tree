@@ -256,9 +256,51 @@ public class TwoFourTree {
             return null;
         }
 
+        private boolean remove (int n) {
+            if (isTwoNode() || !contains(n)) return false; // Cannot remove from two node or remove a value that doesn't exist
+
+            if (isThreeNode()) { // Delete value x and shift proceeding values left
+                if (value1 == n) {
+                    value1 = value2;
+                    value2 = 0;
+                    values = 1;
+                    return true;
+                } else if (value2 == n) {
+                    value2 = 0;
+                    values = 1;
+                    return true;
+                }
+            } else if (isFourNode()) {
+                if (value1 == n) {
+                    value1 = value2;
+                    value2 = value3;
+                    value3 = 0;
+                    values = 2;
+                    return true;
+                } else if (value2 == n) {
+                    value2 = value3;
+                    value3 = 0;
+                    values = 2;
+                    return true;
+                } else if (value3 == n) {
+                    value3 = 0;
+                    values = 2;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private boolean leftFuse () {
             TwoFourTreeItem ls = leftSibling();
             if (parent == null || parent.isTwoNode() || !isTwoNode() || ls == null || !ls.isTwoNode()) return false;
+
+            centerRightChild = leftChild;
+            centerLeftChild = ls.rightChild;
+            leftChild = ls.leftChild;
+            if (centerLeftChild != null) centerLeftChild.parent = this;
+            if (leftChild != null) leftChild.parent = this;
 
             if (parent.isThreeNode()) {
                 if (parent.centerChild == this) {
@@ -266,14 +308,7 @@ public class TwoFourTree {
                     value2 = parent.value1;
                     value1 = ls.value1;
                     values = 3;
-                    centerRightChild = leftChild;
-                    centerLeftChild = ls.rightChild;
-                    leftChild = ls.leftChild;
-                    if (centerLeftChild != null) centerLeftChild.parent = this;
-                    if (leftChild != null) leftChild.parent = this;
-                    parent.value1 = parent.value2;
-                    parent.value2 = 0;
-                    parent.values = 1;
+                    parent.remove(parent.value1);
                     parent.centerChild = null;
                     parent.leftChild = this;
                     return true;
@@ -282,13 +317,7 @@ public class TwoFourTree {
                     value2 = parent.value2;
                     value1 = ls.value1;
                     values = 3;
-                    centerRightChild = leftChild;
-                    centerLeftChild = ls.rightChild;
-                    leftChild = ls.leftChild;
-                    if (centerLeftChild != null) centerLeftChild.parent = this;
-                    if (leftChild != null) leftChild.parent = this;
-                    parent.value2 = 0;
-                    parent.values = 1;
+                    parent.remove(parent.value2);
                     parent.centerChild = null;
                     parent.rightChild = this;
                     return true;
@@ -299,15 +328,7 @@ public class TwoFourTree {
                     value2 = parent.value1;
                     value1 = ls.value1;
                     values = 3;
-                    centerRightChild = leftChild;
-                    centerLeftChild = ls.rightChild;
-                    leftChild = ls.leftChild;
-                    if (centerLeftChild != null) centerLeftChild.parent = this;
-                    if (leftChild != null) leftChild.parent = this;
-                    parent.value1 = parent.value2;
-                    parent.value2 = parent.value3;
-                    parent.value3 = 0;
-                    parent.values = 2;
+                    parent.remove(parent.value1);
                     parent.leftChild = this;
                     parent.centerLeftChild = null;
                     parent.centerChild = parent.centerRightChild;
@@ -318,14 +339,7 @@ public class TwoFourTree {
                     value2 = parent.value2;
                     value1 = ls.value1;
                     values = 3;
-                    centerRightChild = leftChild;
-                    centerLeftChild = ls.rightChild;
-                    leftChild = ls.leftChild;
-                    if (centerLeftChild != null) centerLeftChild.parent = this;
-                    if (leftChild != null) leftChild.parent = this;
-                    parent.value2 = parent.value3;
-                    parent.value3 = 0;
-                    parent.values = 2;
+                    parent.remove(parent.value2);
                     parent.centerChild = this;
                     parent.centerLeftChild = null;
                     parent.centerRightChild = null;
@@ -335,13 +349,7 @@ public class TwoFourTree {
                     value2 = parent.value3;
                     value1 = ls.value1;
                     values = 3;
-                    centerRightChild = leftChild;
-                    centerLeftChild = ls.rightChild;
-                    leftChild = ls.leftChild;
-                    if (centerLeftChild != null) centerLeftChild.parent = this;
-                    if (leftChild != null) leftChild.parent = this;
-                    parent.value3 = 0;
-                    parent.values = 2;
+                    parent.remove(parent.value3);
                     parent.centerChild = parent.centerLeftChild;
                     parent.centerLeftChild = null;
                     parent.centerRightChild = null;
@@ -356,19 +364,18 @@ public class TwoFourTree {
             TwoFourTreeItem rs = rightSibling();
             if (parent == null || parent.isTwoNode() || !isTwoNode() || rs == null || !rs.isTwoNode()) return false;
 
+            centerLeftChild = rightChild;
+            centerRightChild = rs.leftChild;
+            rightChild = rs.rightChild;
+            if (centerRightChild != null) centerRightChild.parent = this;
+            if (rightChild != null) rightChild.parent = this;
+
             if (parent.isThreeNode()) {
                 if (parent.leftChild == this) {
                     value2 = parent.value1;
                     value3 = rs.value1;
                     values = 3;
-                    centerLeftChild = rightChild;
-                    centerRightChild = rs.leftChild;
-                    rightChild = rs.rightChild;
-                    if (centerRightChild != null) centerRightChild.parent = this;
-                    if (rightChild != null) rightChild.parent = this;
-                    parent.value1 = parent.value2;
-                    parent.value2 = 0;
-                    parent.values = 1;
+                    parent.remove(parent.value1);
                     parent.leftChild = this;
                     parent.centerChild = null;
                     return true;
@@ -376,13 +383,7 @@ public class TwoFourTree {
                     value2 = parent.value2;
                     value3 = rs.value1;
                     values = 3;
-                    centerLeftChild = rightChild;
-                    centerRightChild = rs.leftChild;
-                    rightChild = rs.rightChild;
-                    if (centerRightChild != null) centerRightChild.parent = this;
-                    if (rightChild != null) rightChild.parent = this;
-                    parent.value2 = 0;
-                    parent.values = 1;
+                    parent.remove(parent.value2);
                     parent.rightChild = this;
                     parent.centerChild = null;
                     return true;
@@ -392,15 +393,7 @@ public class TwoFourTree {
                     value2 = parent.value1;
                     value3 = rs.value1;
                     values = 3;
-                    centerLeftChild = rightChild;
-                    centerRightChild = rs.leftChild;
-                    rightChild = rs.rightChild;
-                    if (centerRightChild != null) centerRightChild.parent = this;
-                    if (rightChild != null) rightChild.parent = this;
-                    parent.value1 = parent.value2;
-                    parent.value2 = parent.value3;
-                    parent.value3 = 0;
-                    parent.values = 2;
+                    parent.remove(parent.value1);
                     parent.leftChild = this;
                     parent.centerChild = parent.centerRightChild;
                     parent.centerLeftChild = null;
@@ -410,14 +403,7 @@ public class TwoFourTree {
                     value2 = parent.value2;
                     value3 = rs.value1;
                     values = 3;
-                    centerLeftChild = rightChild;
-                    centerRightChild = rs.leftChild;
-                    rightChild = rs.rightChild;
-                    if (centerRightChild != null) centerRightChild.parent = this;
-                    if (rightChild != null) rightChild.parent = this;
-                    parent.value2 = parent.value3;
-                    parent.value3 = 0;
-                    parent.values = 2;
+                    parent.remove(parent.value2);
                     parent.centerChild = this;
                     parent.centerLeftChild = null;
                     parent.centerRightChild = null;
@@ -426,13 +412,7 @@ public class TwoFourTree {
                     value2 = parent.value3;
                     value3 = rs.value1;
                     values = 3;
-                    centerLeftChild = rightChild;
-                    centerRightChild = rs.leftChild;
-                    rightChild = rs.rightChild;
-                    if (centerRightChild != null) centerRightChild.parent = this;
-                    if (rightChild != null) rightChild.parent = this;
-                    parent.value3 = 0;
-                    parent.values = 2;
+                    parent.remove(parent.value3);
                     parent.rightChild = this;
                     parent.centerChild = parent.centerLeftChild;
                     parent.centerLeftChild = null;
@@ -444,12 +424,88 @@ public class TwoFourTree {
             return false;
         }
 
+        private boolean replace (int x, int y) {
+            if (!contains(x)) return false; // Cannot a replace a value that doesn't exist
+
+            if (isTwoNode()) { // Finds value in node, x and replaces it with y
+                if (value1 == x) value1 = y;
+            } else if (isThreeNode()) {
+                if (value1 == x) value1 = y;
+                else if (value2 == x) value2 = y;
+            } else if (isFourNode()) {
+                if (value1 == x) value1 = y;
+                else if (value2 == x) value2 = y;
+                else if (value3 == x) value3 = y;
+            }
+
+            return true;
+        }
+
+        private int immediateleft (int n) {
+            if (contains(n)) return -1; // There is no immediate left value if value exists in node
+
+            if (isTwoNode()) { // Finds value that is immediately to the left of n in the node
+                if (n > value1) return value1;
+            } else if(isThreeNode()) {
+                if (n > value1 && n < value2) return value1;
+                else if (n > value2) return value2; 
+            } else if (isFourNode()) {
+                if (n > value1 && n < value2) return value1;
+                else if (n > value2 && n < value3) return value2;
+                else if (n > value3) return value3;
+            }
+
+            return -1;
+        }
+
+        private int immediateRight (int n) {
+            if (contains(n)) return -1; // There is no immediate right value if value exists in node
+
+            if (isTwoNode()) { // Finds value that is immediately to the right of n in the node
+                if (n < value1) return value1;
+            } else if(isThreeNode()) {
+                if (n > value1 && n < value2) return value2;
+                else if (n < value1) return value1; 
+            } else if (isFourNode()) {
+                if (n > value1 && n < value2) return value2;
+                else if (n > value2 && n < value3) return value3;
+                else if (n < value1) return value1;
+            }
+
+            return -1;
+        }
+
         private boolean rotCW () {
-            
+
         }
 
         private boolean rotCCW () {
+            TwoFourTreeItem rs = rightSibling();
 
+            if (parent == null || rs == null || rs.isTwoNode() || !isTwoNode()) return false;
+
+            int pirv = parent.immediateRight(value1); // Parent's value that is immediately to the right of current node's only value
+            int rslm = rs.value1; // Right sibling's left most value
+
+            parent.replace(pirv, rslm); // Replace parent's right immediate with right right sibling's left most
+            rs.remove(rslm); // Remove right sibling's left most value
+            insert(pirv); // Insert parent's right immediate into current node
+
+            centerChild = rightChild; // Shift left children
+            rightChild = rs.leftChild; // Steal right siblings left most child
+            if(rightChild != null) rightChild.parent = this;
+
+            if (rs.isTwoNode()) { // Shift left right sibling's children
+                rs.leftChild = rs.centerChild;
+                rs.centerChild = null;
+            } else if (rs.isThreeNode()) {
+                rs.leftChild = rs.centerLeftChild;
+                rs.centerChild = rs.centerRightChild;
+                rs.centerLeftChild = null;
+                rs.centerRightChild = null;
+            }
+
+            return true;
         }
 
         private boolean deleteValue () {
