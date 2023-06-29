@@ -289,6 +289,8 @@ public class TwoFourTree {
             TwoFourTreeItem ls = leftSibling();
             if (parent == null || parent.isTwoNode() || !isTwoNode() || ls == null || !ls.isTwoNode()) return false;
 
+            // System.out.println(value1 + ", " + value2 + ", " + value3);
+
             centerRightChild = leftChild;
             centerLeftChild = ls.rightChild;
             leftChild = ls.leftChild;
@@ -577,38 +579,36 @@ public class TwoFourTree {
             if (!isTwoNode()) return false;
             TwoFourTreeItem ls = leftSibling(), rs = rightSibling();
 
+            // if (rs != null && !rs.isTwoNode()) System.out.println("Rotating CCW"); // Delete me
+            // else if (ls != null && !ls.isTwoNode()) System.out.println("Rotating Clockwise");
+            // else if (ls != null) System.out.println("Left Fusing");
+            // else if (rs != null) System.out.println("Right Fusing");
+
             if (rs != null && !rs.isTwoNode()) return rotCCW();
             else if (ls != null && !ls.isTwoNode()) return rotCW();
-            else if (rs != null) return rightFuse();
             else if (ls != null) return leftFuse();
+            else if (rs != null) return rightFuse();
 
             return false;
         }
 
         public boolean deleteValue (int n) {
-            System.out.println("Current node v1=" + value1);
             if (isRoot()) fuseRoot();
             TwoFourTreeItem next = next(n);
             if (isTwoNode())
                 fuseRotate();
             if (contains(n)) {
-                //System.out.println("FOUND " + n + " in node (" + value1 + ", " + value2 + ", " +  value3 + ")" + " values: " + values + " isLeaf?: " + isLeaf);
-                //System.out.println("L: " + leftChild + " CL: " + centerLeftChild + " C: " + centerChild + " CR: " + centerRightChild + " R: " + rightChild);
-                if (isLeaf) return remove(n);
-                TwoFourTreeItem irc = immediateRightChild(n);
-                System.out.println("IRC: " + irc.value1);
+                if (isLeaf) return remove(n); // If target contained in leaf just remove it
+                TwoFourTreeItem irc = immediateRightChild(n); // Goto target node's immediate right's left most descendant, fuse/rotate along the way
                 if (irc.isTwoNode()) irc.fuseRotate();
+                if (irc.contains(n)) irc.deleteValue(n); // irc fused into node containing value
+
                 TwoFourTreeItem irlmd = irc.leftmostDescendant(); // Immediate right child's left most decendant
-                System.out.println("IRC: (" + irc.value1 + " " + irc.value2 + " " + irc.value3 + ") ");
-                System.out.println("IRLMD: " + "(" + irlmd.value1 + " " + irlmd.value2 + " " + irlmd.value3 + ") ");
-                System.out.println("IRLMD==IRC? " + (irlmd==irc) + ", IRLMD isLeaf? " + irlmd.isLeaf);
-                if (irc == irlmd) return remove(n); // If irlmd happened to fuse into irc
-                replace(n, irlmd.value1);
+                replace(n, irlmd.value1); // Swap left most decendant's left most value with target node's target value
                 irlmd.replace(irlmd.value1, n);
-                //System.out.println("After REPLACE: " + "Imrclmd: " + irlmd.value1 + " this v1: " + value1);
                 return irlmd.remove(n);
             }
-            //System.out.println("Current node v1: " + value1 + " next v1: " + next.value1);
+
             return (next == null) ? false : next.deleteValue(n);
         }
     }
