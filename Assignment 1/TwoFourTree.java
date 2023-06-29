@@ -599,7 +599,10 @@ public class TwoFourTree {
                 System.out.println("IRC: " + irc.value1);
                 if (irc.isTwoNode()) irc.fuseRotate();
                 TwoFourTreeItem irlmd = irc.leftmostDescendant(); // Immediate right child's left most decendant
-                //System.out.println("Imrclmd: " + irlmd.value1);
+                System.out.println("IRC: (" + irc.value1 + " " + irc.value2 + " " + irc.value3 + ") ");
+                System.out.println("IRLMD: " + "(" + irlmd.value1 + " " + irlmd.value2 + " " + irlmd.value3 + ") ");
+                System.out.println("IRLMD==IRC? " + (irlmd==irc) + ", IRLMD isLeaf? " + irlmd.isLeaf);
+                if (irc == irlmd) return remove(n); // If irlmd happened to fuse into irc
                 replace(n, irlmd.value1);
                 irlmd.replace(irlmd.value1, n);
                 //System.out.println("After REPLACE: " + "Imrclmd: " + irlmd.value1 + " this v1: " + value1);
