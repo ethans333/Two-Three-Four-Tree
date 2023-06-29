@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.Collections;
 
 public class App {
-	static long RandomSeed = 1;
+	static long RandomSeed = 317;
 	static Random RandomGenerator = new Random(RandomSeed);
 
     private static ArrayList<Integer> deDuplicateAndScramble(ArrayList<Integer> list) {
@@ -19,7 +19,7 @@ public class App {
 		ArrayList<Integer> list = new ArrayList<Integer>(howMany);
 		
 		for(int i = 0; i < howMany; i++) {
-			list.add(Integer.valueOf(RandomGenerator.nextInt(0, 1000000000)));
+			list.add(Integer.valueOf(RandomGenerator.nextInt(0, 100)));
 		}
         list = deDuplicateAndScramble(list);
 		
@@ -119,14 +119,15 @@ public class App {
         if(includeRemoves) {
             start = System.currentTimeMillis();
             for (Integer e: removeList) {
-/*                 System.out.printf("----- delete %d from tree\n", e.intValue());
-                theTree.printInOrder(); */
+                 System.out.printf("----- delete %d from tree\n", e.intValue()); // Comment me
+                theTree.printInOrder();
                 theTree.deleteValue(e.intValue()); 
                 if(theTree.hasValue(e.intValue())) {
                     System.out.printf("Failed to delete %d\n", e.intValue());
+                    break; // Comment me
                 }
-/*                 System.out.printf("----- After deleting %d from tree\n", e.intValue());
-                theTree.printInOrder(); */
+                System.out.printf("----- After deleting %d from tree\n", e.intValue()); // Comment me
+                theTree.printInOrder();
             }
             end = System.currentTimeMillis();
             ms = end - start;
@@ -185,55 +186,60 @@ public class App {
 	}
 
     public static void main(String[] args) throws Exception {
-        TwoFourTree tft = new TwoFourTree();
-        tft.addValue(2);
-        tft.addValue(3);
-        tft.addValue(5);
-        tft.addValue(7);
-        tft.addValue(11);
-        tft.addValue(13);
-        tft.addValue(17);
-        tft.addValue(19);
-        tft.addValue(23);
-        tft.addValue(29);
-        tft.addValue(31);
-        tft.addValue(37);
-        tft.addValue(41);
-        tft.addValue(43);
-        tft.addValue(47);
-        tft.addValue(53);
-        tft.addValue(59);
-        tft.addValue(67);
-        tft.addValue(71);
-        tft.addValue(73);
-        tft.addValue(79);
-        tft.addValue(83);
-        tft.addValue(89);
-        tft.addValue(97);
-
-        System.out.println("ORIGINAL TREE: ");
-        tft.printInOrder();
+        // TwoFourTree tft = new TwoFourTree();
+        // tft.addValue(2);
+        // tft.addValue(3);
+        // tft.addValue(5);
+        // tft.addValue(7);
+        // tft.addValue(11);
+        // tft.addValue(13);
+        // tft.addValue(17);
+        // tft.addValue(19);
+        // tft.addValue(23);
+        // tft.addValue(29);
+        // tft.addValue(31);
+        // tft.addValue(37);
+        // tft.addValue(41);
+        // tft.addValue(43);
+        // tft.addValue(47);
+        // tft.addValue(53);
+        // tft.addValue(59);
+        // tft.addValue(67);
+        // tft.addValue(71);
+        // tft.addValue(73);
+        // tft.addValue(79);
+        // tft.addValue(83);
+        // tft.addValue(89);
+        // tft.addValue(97);
 
         
         // System.out.println("Static test: first few prime numbers:");
         // tft.printInOrder();
-        System.out.println("DELETE STATUS: " + tft.deleteValue(37));
-        System.out.println("\nWithout 37:");
-        tft.printInOrder();
-        System.out.println("DELETE STATUS: " + tft.deleteValue(73));
-        System.out.println("\nWithout 73:");
-        tft.printInOrder();
-        System.out.println("DELETE STATUS: " + tft.deleteValue(97));
-        System.out.println("\nWithout 97:");
-        tft.printInOrder();
+        // tft.deleteValue(37);
+        // System.out.println("\nWithout 37:");
+        // tft.printInOrder();
+        // tft.deleteValue(73);
+        // System.out.println("\nWithout 73:");
+        // tft.printInOrder();
+        // tft.deleteValue(97);
+        // System.out.println("\nWithout 97:");
+        // tft.printInOrder();
         
+        // while (true) {
+        //     RandomSeed++;
+        //     System.out.printf("Case #%d\n", RandomSeed);
+        //     RandomGenerator = new Random(RandomSeed);
+        //     executeIntCase(20, 20, true);
+        // }
 
-        executeIntCase(100, 20, true);
-        executeIntCase(1000, 200, true);
+        executeIntCase(20, 20, true);
+
+        // executeIntCase(100, 20, true);
+        // executeIntCase(1000, 200, true);
         // executeIntCase(10000, 2000, true);
         // executeIntCase(100000, 20000, true);
-        // executeIntCase(1000000, 200000, false);
-        // executeIntCase(10000000, 2000000, false);
+        // executeIntCase(1000000, 200000, true);
+        // executeIntCase(10000000, 2000000, true);
         
     }
 }

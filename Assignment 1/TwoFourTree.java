@@ -71,7 +71,10 @@ public class TwoFourTree {
         }
 
         private boolean contains (int n) {
-            return (value1 == n || value2 == n || value3 == n); // If atleast one of the values in the node equals n return true
+            if (isTwoNode()) return (value1 == n);
+            else if (isThreeNode()) return (value1 == n || value2 == n);
+            else if (isFourNode()) return (value1 == n || value2 == n || value3 == n); // If atleast one of the values in the node equals n return true
+            return false;
         }
 
         private TwoFourTreeItem next (int n) {
@@ -538,8 +541,8 @@ public class TwoFourTree {
             value3 = rightChild.value1;
             values = 3;
             if (leftChild.isLeaf && rightChild.isLeaf) isLeaf = true; // If both children were leaves then this is now a leaf
-            leftChild = leftChild.leftChild; // Adopt children's children
-            centerLeftChild = leftChild.rightChild;
+            centerLeftChild = leftChild.rightChild; // Adopt children's children
+            leftChild = leftChild.leftChild;
             centerRightChild = rightChild.leftChild;
             rightChild = rightChild.rightChild;
             if (leftChild != null) leftChild.parent = this; // Children's new parent is this
@@ -583,6 +586,7 @@ public class TwoFourTree {
         }
 
         public boolean deleteValue (int n) {
+            System.out.println("Current node v1=" + value1);
             if (isRoot()) fuseRoot();
             TwoFourTreeItem next = next(n);
             if (isTwoNode())
@@ -592,6 +596,7 @@ public class TwoFourTree {
                 //System.out.println("L: " + leftChild + " CL: " + centerLeftChild + " C: " + centerChild + " CR: " + centerRightChild + " R: " + rightChild);
                 if (isLeaf) return remove(n);
                 TwoFourTreeItem irc = immediateRightChild(n);
+                System.out.println("IRC: " + irc.value1);
                 if (irc.isTwoNode()) irc.fuseRotate();
                 TwoFourTreeItem irlmd = irc.leftmostDescendant(); // Immediate right child's left most decendant
                 //System.out.println("Imrclmd: " + irlmd.value1);
