@@ -70,6 +70,9 @@ public class TwoFourTree {
             if(!isLeaf) rightChild.printInOrder(indent + 1);
         }
 
+        // Returns whether or not value is contained in current node
+        // Parameters: int n: value to be looked for in current node
+        // If value not in node returns false
         private boolean contains (int n) {
             if (isTwoNode()) return (value1 == n);
             else if (isThreeNode()) return (value1 == n || value2 == n);
@@ -77,6 +80,9 @@ public class TwoFourTree {
             return false;
         }
 
+        // Returns child that contains the interval of value n
+        // Parameters: int n: value that exists within node's interval
+        // If value is already contained in node then returns null
         private TwoFourTreeItem next (int n) {
             if (contains(n)) return null; // If current node contains n then there is no other node to traverse to
             if (isTwoNode()) {
@@ -95,6 +101,8 @@ public class TwoFourTree {
             return null;
         }
 
+        // Recursively searches tree in order to find a particular node
+        // If node doesn't exist returns false otherwise returns true
         public boolean find (int n) {
             if (contains(n)) return true; // If n in current node stop
             TwoFourTreeItem next = next(n);
@@ -102,6 +110,10 @@ public class TwoFourTree {
             return next.find(n); // Go to next node in tree and continue
         }
 
+        // Splits four node into 3 two nodes, the middle value being the top node and the left and right values being its children
+        // If node is root, center value becomes a two node and becomes the new root, otherwise center value gets inserted into parent
+        // Returns top of newly split node
+        // If an attempt is made to split on a node that is not a four node then will return null
         private TwoFourTreeItem splitUp () {
             TwoFourTreeItem l = new TwoFourTreeItem(value1); // New left and right nodes containing left and right values of four node
             TwoFourTreeItem r = new TwoFourTreeItem(value3);
@@ -174,6 +186,9 @@ public class TwoFourTree {
             return null;
         }
 
+        // Inserts value n into node, shift over other values to make space
+        // Parameters: int n: value to be inserted into node
+        // Cannot insert four node, if an attempt is made returns false, otherwise returns true
         private boolean insert (int n) {
             if (isFourNode() || contains(n)) return false; // Can't insert into four nodes, won't insert into nodes that already contain value you're inserting
             if (isTwoNode()) {
@@ -208,12 +223,17 @@ public class TwoFourTree {
             return false;
         }
 
+        // Traverses tree properly adding value into tree
+        // Parameters: int n: value to be inserted into tree
         public boolean addValue (int n) {
             if (isFourNode()) return splitUp().next(n).addValue(n); // Split four node, middle value going up, go to next node and continue
             if (isLeaf) return insert(n); // If is leaf insert into the leaf
             return next(n).addValue(n); // Go to next node and continue
         }
 
+        // Returns sibling to the left of current node
+        // Returns a node item
+        // If node doesn't have a right sibling, i.e is leftmost child in parent node then returns null
         private TwoFourTreeItem leftSibling () {
             if (parent == null || parent.leftChild == this) return null; // Not possible for root to have siblings or for left children to have left siblings
 
@@ -231,6 +251,9 @@ public class TwoFourTree {
             return null;
         }
 
+        // Returns sibling to the right of current node
+        // Returns a node item
+        // If node doesn't have a right sibling, i.e is rightmost child in parent node then returns null
         private TwoFourTreeItem rightSibling () {
             if (parent == null || parent.rightChild == this) return null; // Not possible for root to have siblings or for right children to have right siblings
 
@@ -248,10 +271,12 @@ public class TwoFourTree {
             return null;
         }
 
+        // Removes value n from node
+        // Parameters: int n: value in node to be deleted
+        // n must exist in node otherwise will return false
+        // Returns true if removal was successful, false otherwise. Doesn't rearrange children
         private boolean remove (int n) {
-            //System.out.println("Removing a node that contains: " + this.value1);
             if (isTwoNode() || !contains(n)) return false; // Cannot remove from two node or remove a value that doesn't exist
-            //System.out.println("REMOVING: " + n + " v1 = " + value1 + " v2 = " + value2 + " " + (value2 == n));
             if (isThreeNode()) { // Delete value x and shift proceeding values left
                 if (value1 == n) {
                     value1 = value2;
@@ -285,19 +310,23 @@ public class TwoFourTree {
             return false;
         }
 
+        // Fuses current node's left sibling and the parent value between the two nodes into current node
+        // If current node doesn't have a parent or doesn't have a left sibling or its left sibling isn't a
+        // two node or current node isn't a two node or parent node is a two node then returns false
+        // Returns true if fuse was successful, false if above conditions aren't met
         private boolean leftFuse () {
             TwoFourTreeItem ls = leftSibling();
             if (parent == null || parent.isTwoNode() || !isTwoNode() || ls == null || !ls.isTwoNode()) return false;
 
             // System.out.println(value1 + ", " + value2 + ", " + value3);
 
-            centerRightChild = leftChild;
+            centerRightChild = leftChild; // Rearrange children
             centerLeftChild = ls.rightChild;
             leftChild = ls.leftChild;
-            if (centerLeftChild != null) centerLeftChild.parent = this;
+            if (centerLeftChild != null) centerLeftChild.parent = this; // Reassign children's new parent; this
             if (leftChild != null) leftChild.parent = this;
 
-            if (parent.isThreeNode()) {
+            if (parent.isThreeNode()) { // Rearrange parent's values and children
                 if (parent.centerChild == this) {
                     value3 = value1;
                     value2 = parent.value1;
@@ -355,6 +384,10 @@ public class TwoFourTree {
             return false;
         }
 
+        // Fuses current node's right sibling and the parent value between the two nodes into current node
+        // If current node doesn't have a parent or doesn't have a right sibling or its right sibling isn't a
+        // two node or current node isn't a two node or parent node is a two node then returns false
+        // Returns true if fuse was successful, false if above conditions aren't met
         private boolean rightFuse () {
             TwoFourTreeItem rs = rightSibling();
             if (parent == null || parent.isTwoNode() || !isTwoNode() || rs == null || !rs.isTwoNode()) return false;
@@ -419,6 +452,9 @@ public class TwoFourTree {
             return false;
         }
 
+        // Replaces a certain value in current node with a new value
+        // Parameters: int x: value in node to be replaced, int y: value that will replace x
+        // If x does not exist in node then returns false, otherwise returns true
         private boolean replace (int x, int y) {
             if (!contains(x)) return false; // Cannot a replace a value that doesn't exist
 
@@ -436,6 +472,9 @@ public class TwoFourTree {
             return true;
         }
 
+        // Returns value that is immediately to the left of n in a node
+        // Parameters: int n: value in node, whos left neighboring value gets returned
+        // If n is a leftmost value there cannot be value to the left of it and therefore returns false
         private int immediateleft (int n) {
             if (contains(n)) return -1; // There is no immediate left value if value exists in node
 
@@ -453,6 +492,9 @@ public class TwoFourTree {
             return -1;
         }
 
+        // Returns value that is immediately to the right of n in a node
+        // Parameters: int n: value in node, whos right neighboring value gets returned
+        // If n is a rightmost value there cannot be value to the right of it and therefore returns false
         private int immediateRight (int n) {
             if (contains(n)) return -1; // There is no immediate right value if value exists in node
 
@@ -470,6 +512,8 @@ public class TwoFourTree {
             return -1;
         }
 
+        // Returns the right most value of a node
+        // If an attempt is made to retrieve the rightmost value of anything that isn't a 2,3 or 4 node returns -1
         private int rightMostValue () {
             if (isTwoNode()) return value1;
             else if (isThreeNode()) return value2;
@@ -478,6 +522,9 @@ public class TwoFourTree {
             return -1;
         }
 
+        // Makes current node a three node from a two node by rotating parents value and left sibling's value clockwise
+        // Returns true if rotation was successful false otherwise
+        // Will not rotate if current node is not a two node, doesn't have a parent, or who's left sibling is a two node
         private boolean rotCW () {
             TwoFourTreeItem ls = leftSibling();
 
@@ -507,6 +554,9 @@ public class TwoFourTree {
             return true;
         }
 
+        // Makes current node a three node from a two node by rotating parents value and right sibling's value counter clockwise
+        // Returns true if rotation was successful false otherwise
+        // Will not rotate if current node is not a two node, doesn't have a parent, or who's right sibling is a two node
         private boolean rotCCW () {
             TwoFourTreeItem rs = rightSibling();
 
@@ -536,6 +586,8 @@ public class TwoFourTree {
             return true;
         }
 
+        // Fuses root into a four node and only the root iff it has two children that are two nodes and itself is a two node
+        // Returns true if fuse was successful, false if conditions above weren't met.
         private boolean fuseRoot () {
             if (!isRoot() || !isTwoNode() || leftChild == null || rightChild == null || !leftChild.isTwoNode() || !rightChild.isTwoNode()) return false; // This, left and right children must be two nodes and this must be the root
             value2 = value1; // Merge children's values into this
@@ -554,8 +606,11 @@ public class TwoFourTree {
             return true;
         }
 
+        // Returns child that is immediately to the right of the current node's value, n
+        // Parameters: int n: value in node used in order to find immediate right child
+        // If n doesn't exist or the child to the right is null it will return null
         private TwoFourTreeItem immediateRightChild (int n) {
-            if (isTwoNode()) {
+            if (isTwoNode()) { // Compare n with each value to see which child is to the right of it
                 if (n == value1) return rightChild;
             } else if (isThreeNode()) {
                 if (n == value1) return centerChild;
@@ -566,37 +621,38 @@ public class TwoFourTree {
                 if (n == value3) return rightChild;
             }
 
-            return null;
+            return null; // n doesn't exist in node
         }
 
+        // Retrieves left most descdant of a value, fuses/rotates along the way
+        // Will return null if node called on doesn't have a left child and isn't a leaf itself
         private TwoFourTreeItem leftmostDescendant () {
             if (isTwoNode()) fuseRotate();
-            if (isLeaf) return this;
-            return leftChild.leftmostDescendant();
+            if (isLeaf) return this; // Stop, left most descendant which should be a leaf found
+            return leftChild.leftmostDescendant(); // Otherwise, continue
         }
 
+        // Decision tree for deciding whether to fuse or rotate and in what direction.
+        // Cannot fuse or rotate on any node that isn't a two node, if attempted will return false, returns true if successful
         private boolean fuseRotate () {
             if (!isTwoNode()) return false;
             TwoFourTreeItem ls = leftSibling(), rs = rightSibling();
 
-            // if (rs != null && !rs.isTwoNode()) System.out.println("Rotating CCW"); // Delete me
-            // else if (ls != null && !ls.isTwoNode()) System.out.println("Rotating Clockwise");
-            // else if (ls != null) System.out.println("Left Fusing");
-            // else if (rs != null) System.out.println("Right Fusing");
-
-            if (rs != null && !rs.isTwoNode()) return rotCCW();
-            else if (ls != null && !ls.isTwoNode()) return rotCW();
-            else if (ls != null) return leftFuse();
-            else if (rs != null) return rightFuse();
+            if (rs != null && !rs.isTwoNode()) return rotCCW(); // Right sibling is not a two node -> Counter Clockwise Rotation
+            else if (ls != null && !ls.isTwoNode()) return rotCW(); // Left sibling is not a two node -> Clockwise rotation
+            else if (ls != null) return leftFuse(); // Fuse left
+            else if (rs != null) return rightFuse(); // Fuse right
 
             return false;
         }
 
+        // Deletes value from tree
+        // Parameters: int n: Value to be deleted
+        // If value doesn't exist in tree returns false, otherwise true
         public boolean deleteValue (int n) {
-            if (isRoot()) fuseRoot();
+            if (isRoot()) fuseRoot(); // Fuse root if itself and its children are all two nodes
             TwoFourTreeItem next = next(n);
-            if (isTwoNode())
-                fuseRotate();
+            if (isTwoNode()) fuseRotate(); // Fuse/rotate two nodes
             if (contains(n)) {
                 if (isLeaf) return remove(n); // If target contained in leaf just remove it
                 TwoFourTreeItem irc = immediateRightChild(n); // Goto target node's immediate right's left most descendant, fuse/rotate along the way
@@ -609,30 +665,34 @@ public class TwoFourTree {
                 return irlmd.remove(n);
             }
 
-            return (next == null) ? false : next.deleteValue(n);
+            return (next == null) ? false : next.deleteValue(n); // Next is null, value not in tree, otherwise continue
         }
     }
 
     TwoFourTreeItem root = null;
 
+    // Adds value to tree, uses helper addValue
     public boolean addValue(int value) {
-        if (root == null) {
+        if (root == null) { // If no root then create new root with new value
             root = new TwoFourTreeItem(value);
             return true;
         }
-        return root.addValue(value);
+        return root.addValue(value); // Otherwise add value
     }
 
+    // Searches for value in tree, uses helper find
     public boolean hasValue(int value) {
-        if (root == null) return false;
-        return root.find(value);
+        if (root == null) return false; // If no root then value isn't in tree
+        return root.find(value); // Otherwise find root
     }
 
+    // Deletes value from tree, uses helper deleteValue
     public boolean deleteValue(int value) {
-        if (root == null) return false;
-        return root.deleteValue(value);
+        if (root == null) return false; // If no root then no tree to delete value with, returns false
+        return root.deleteValue(value); // Otherwise delete value
     }
 
+    // Prints in order traversal of tree
     public void printInOrder() {
         if(root != null) root.printInOrder(0);
     }
