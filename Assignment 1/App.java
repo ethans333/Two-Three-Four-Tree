@@ -211,9 +211,12 @@ public class App {
         tft.addValue(89);
         tft.addValue(97);
 
-        
-        System.out.println("Static test: first few prime numbers:");
+        System.out.println("ORIGINAL TREE: ");
         tft.printInOrder();
+
+        
+        // System.out.println("Static test: first few prime numbers:");
+        // tft.printInOrder();
         System.out.println("DELETE STATUS: " + tft.deleteValue(37));
         System.out.println("\nWithout 37:");
         tft.printInOrder();
@@ -225,8 +228,8 @@ public class App {
         tft.printInOrder();
         
 
-        // executeIntCase(100, 20, true);
-        // executeIntCase(1000, 200, true);
+        executeIntCase(100, 20, true);
+        executeIntCase(1000, 200, true);
         // executeIntCase(10000, 2000, true);
         // executeIntCase(100000, 20000, true);
         // executeIntCase(1000000, 200000, false);

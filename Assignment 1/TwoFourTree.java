@@ -246,6 +246,7 @@ public class TwoFourTree {
         }
 
         private boolean remove (int n) {
+            //System.out.println("Removing a node that contains: " + this.value1);
             if (isTwoNode() || !contains(n)) return false; // Cannot remove from two node or remove a value that doesn't exist
             //System.out.println("REMOVING: " + n + " v1 = " + value1 + " v2 = " + value2 + " " + (value2 == n));
             if (isThreeNode()) { // Delete value x and shift proceeding values left
@@ -564,35 +565,42 @@ public class TwoFourTree {
         }
 
         private TwoFourTreeItem leftmostDescendant () {
+            if (isTwoNode()) fuseRotate();
             if (isLeaf) return this;
-            TwoFourTreeItem ls = leftSibling(), rs = rightSibling();
-            if (isTwoNode()) {
-                if (rs != null && !rs.isTwoNode()) rotCCW();
-                else if (ls != null && !ls.isTwoNode()) rotCW();
-                else if (rs != null) rightFuse();
-                else if (ls != null) leftFuse();
-            }
             return leftChild.leftmostDescendant();
         }
 
+        private boolean fuseRotate () {
+            if (!isTwoNode()) return false;
+            TwoFourTreeItem ls = leftSibling(), rs = rightSibling();
+
+            if (rs != null && !rs.isTwoNode()) return rotCCW();
+            else if (ls != null && !ls.isTwoNode()) return rotCW();
+            else if (rs != null) return rightFuse();
+            else if (ls != null) return leftFuse();
+
+            return false;
+        }
+
         public boolean deleteValue (int n) {
-            TwoFourTreeItem ls = leftSibling(), rs = rightSibling(), next = next(n);
             if (isRoot()) fuseRoot();
-            if (isTwoNode()) {
-                if (rs != null && !rs.isTwoNode()) rotCCW();
-                else if (ls != null && !ls.isTwoNode()) rotCW();
-                else if (rs != null) rightFuse();
-                else if (ls != null) leftFuse();
-            }
+            TwoFourTreeItem next = next(n);
+            if (isTwoNode())
+                fuseRotate();
             if (contains(n)) {
-                System.out.println("FOUND " + n + " in node (" + value1 + ", " + value2 + ", " +  value3 + ")" + " values: " + values + " isLeaf?: " + isLeaf);
-                System.out.println("L: " + leftChild + " CL: " + centerLeftChild + " CR: " + centerRightChild + " R: " + rightChild);
+                //System.out.println("FOUND " + n + " in node (" + value1 + ", " + value2 + ", " +  value3 + ")" + " values: " + values + " isLeaf?: " + isLeaf);
+                //System.out.println("L: " + leftChild + " CL: " + centerLeftChild + " C: " + centerChild + " CR: " + centerRightChild + " R: " + rightChild);
                 if (isLeaf) return remove(n);
-                TwoFourTreeItem irlmd = immediateRightChild(n).leftmostDescendant();
+                TwoFourTreeItem irc = immediateRightChild(n);
+                if (irc.isTwoNode()) irc.fuseRotate();
+                TwoFourTreeItem irlmd = irc.leftmostDescendant(); // Immediate right child's left most decendant
+                //System.out.println("Imrclmd: " + irlmd.value1);
                 replace(n, irlmd.value1);
                 irlmd.replace(irlmd.value1, n);
+                //System.out.println("After REPLACE: " + "Imrclmd: " + irlmd.value1 + " this v1: " + value1);
                 return irlmd.remove(n);
             }
+            //System.out.println("Current node v1: " + value1 + " next v1: " + next.value1);
             return (next == null) ? false : next.deleteValue(n);
         }
     }
