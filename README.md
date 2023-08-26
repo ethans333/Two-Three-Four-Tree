@@ -1,4 +1,4 @@
-# Two Three Four 🌲
+# Two Three Four Tree 🌲
 
 Two Three Four tree implementation in Java. 
 
